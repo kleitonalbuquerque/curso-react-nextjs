@@ -24,3 +24,4 @@ yarn-error.log*
 
 # files
 src/templates/Home/indexOld.jsx
+src/templates/Home/indexThisSetStateOnClass.jsx
