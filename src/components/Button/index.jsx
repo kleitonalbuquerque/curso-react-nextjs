@@ -1,5 +1,4 @@
-import './styles.css'
-;
+import "./styles.css";
 import { Component } from "react";
 
 export class Button extends Component {
@@ -7,12 +6,9 @@ export class Button extends Component {
     const { text, onClick, disabled } = this.props;
 
     return (
-    <button
-      disabled={disabled}
-      className='btn' 
-      onClick={onClick}>
+      <button disabled={disabled} className="btn" onClick={onClick}>
         {text}
-    </button>
+      </button>
     );
     // return <button>{ this.props.text }</button>;
   }
