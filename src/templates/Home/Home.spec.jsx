@@ -3,6 +3,7 @@ import { setupServer } from 'msw/node';
 
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { Home } from '.';
+import userEvent from '@testing-library/user-event';
 
 const handlers = [
   rest.get('*jsonplaceholder.typicode.com*', async (req, res, ctx) => {
@@ -65,5 +66,39 @@ describe('<Home />', () => {
     const button = screen.getByRole('button', { name: /load more posts/i });
     expect(button).toBeInTheDocument();
     screen.debug();
+  });
+
+  it('should search for posts', async () => {
+    // carrega o componente
+    render(<Home />);
+    const noMorePosts = screen.getByText('Não existem posts =(');
+
+    expect.assertions(10);
+
+    // espera o react realizar a chamada externa no caso do useEffect
+    await waitForElementToBeRemoved(noMorePosts);
+
+    const search = screen.getByPlaceholderText(/type your search/i);
+
+    // checa se title 1 e title 2 estão na tela e o title 3 não
+    expect(screen.getByRole('heading', { name: 'title 1' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'title 2' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'title3 3' })).not.toBeInTheDocument();
+
+    // digita o title 1 e somente ele pode estar na tela
+    userEvent.type(search, 'title 1')
+    expect(screen.getByRole('heading', { name: 'title 1' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'title 2' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'title3 3' })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Search value: title 1' })).toBeInTheDocument();
+
+    // limpa o input
+    userEvent.clear(search)
+    expect(screen.getByRole('heading', { name: 'title 1' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'title 2' })).toBeInTheDocument();
+
+    // digita algo que n existe e mostra msg de posts q não existe
+    userEvent.type(search, 'post does not exist')
+    expect(screen.getByText('Não existem posts =(')).toBeInTheDocument();
   });
 });
